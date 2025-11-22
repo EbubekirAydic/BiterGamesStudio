@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>BiterGamesStudio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Dancing+Script:wght@400..700&display=swap" rel="stylesheet">
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        font-family: "Bebas Neue", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        height: 100%;
+    }
+
+    body {
+        background: #0f0f0f;
+        color: #e8e8e8;
+        overflow-x: hidden;
+        overflow-y: auto;
+        scroll-behavior: smooth;
+        -webkit-font-smoothing: antialiased;
+        scroll-snap-type: y mandatory;
+    }
+
+    /* Hide scrollbar for most browsers */
+    ::-webkit-scrollbar { display: none; }
+    html { scrollbar-width: none; -ms-overflow-style: none; }
+
+
+    /* ================= GİRİŞ KISMI ================ */
+    #intro {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: black;
+        text-align: center;
+        animation: fadeIn 1.2s forwards;
+        scroll-snap-align: start;
+    }
+
+    #intro h1 {
+        font-size: 4rem;
+        letter-spacing: 3px;
+        font-weight: bold;
+    }
+
+    #intro p {
+        opacity: 0.9;
+        margin-top: 10px;
+    }
+
+    /* Intro logo */
+    .intro-logo {
+        margin-bottom: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+    }
+
+    .intro-logo img {
+        width: 320px;
+        max-width: 60vw;
+        height: auto;
+        opacity: 0;
+        transform: scale(.85) translateY(8px);
+        filter: drop-shadow(0 10px 24px rgba(0,0,0,0.6));
+        animation: logoIn .9s cubic-bezier(.2,.9,.3,1) .2s forwards, floaty 4s ease-in-out 1.2s infinite;
+    }
+
+    @keyframes logoIn {
+        from { opacity: 0; transform: scale(.7) translateY(-8px); }
+        to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes floaty {
+        0% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+        100% { transform: translateY(0); }
+    }
+
+    @media (max-width: 640px) {
+        .intro-logo img { width: 200px; }
+        #intro h1 { font-size: 2.6rem; }
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    /* ============== BÖLÜMLER GENEL ============== */
+    section {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 10%;
+        scroll-snap-align: start;
+        scroll-snap-stop: always;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity .8s ease, transform .8s ease;
+    }
+
+    /* İçerik konteyneri: maksimum genişlik ve ortalama hizalama */
+    section > * {
+        max-width: 1200px;
+        width: 100%;
+    }
+
+    section.in-view {
+        opacity: 1;
+        transform: translateY(0);
+        background: linear-gradient(90deg, #000000, #2c2c2c);
+    }
+
+    section h2 {
+        font-size: 2.4rem;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    section p {
+        max-width: 900px;
+        opacity: .9;
+        line-height: 1.5;
+        margin: 0 auto;
+        text-align: center;
+        font-size: x-large;
+    }
+
+    /* =========== KART TASARIMI =========== */
+    .card-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 25px;
+    }
+
+    /* Horizontal scroll mode when container has many cards */
+    .card-container.scroll-x {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        position: relative;
+        border-radius: 30px;
+    }
+
+    .card-container.scroll-x .card {
+        flex: 0 0 270px;
+        scroll-snap-align: start;
+    }
+
+    /* hide scrollbar for scroll-x containers */
+    .card-container.scroll-x::-webkit-scrollbar { display: none; }
+    .card-container.scroll-x { scrollbar-width: none; -ms-overflow-style: none; }
+
+    /* subtle left/right gradients to indicate more content */
+    /* Gradients placed outside scrolling container so they don't scroll with content */
+    .carousel-gradient {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 60px;
+        pointer-events: none;
+        z-index: 5;
+    }
+    .carousel-gradient.left {  left: 0;  background: linear-gradient(90deg, rgba(15,15,15,1), rgba(15,15,15,0)); border-radius: 10px; }
+    .carousel-gradient.right { right: 0; background: linear-gradient(270deg, rgba(15,15,15,1), rgba(15,15,15,0)); border-radius: 10px; }
+
+    /* Carousel controls (arrows + dots) */
+    .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+        cursor: pointer;
+        z-index: 10;
+        transition: transform .18s ease, background .18s ease;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+    }
+
+    .carousel-arrow:hover { transform: translateY(-50%) scale(1.06); background: rgba(0,0,0,0.8); }
+
+    .carousel-arrow.left { left: 8px; }
+    .carousel-arrow.right { right: 8px; }
+
+    .carousel-dots {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: -28px;
+        display: flex;
+        gap: 8px;
+        z-index: 12;
+    }
+
+    .carousel-dots button {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        border: none;
+        background: rgba(255,255,255,0.18);
+        cursor: pointer;
+        transition: transform .18s ease, background .18s ease;
+    }
+
+    .carousel-dots button.active { background: #ffd700; transform: scale(1.25); }
+
+    /* Host wrapper to place controls outside of the scrolling container so they don't move */
+    .carousel-host { position: relative; }
+
+    .card {
+        width: 270px;
+        background: #1a1a1a;
+        border-radius: 10px;
+        padding: 20px;
+        transition: transform .28s ease, box-shadow .28s ease, background .18s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(0,0,0,0.40);
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        background: #222;
+        /* when the card lifts, reduce shadow offset so it visually follows the card */
+        box-shadow: 0 6px 18px rgba(0,0,0,0.36);
+    }
+
+    .card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+        transition: opacity .6s ease, transform .35s ease;
+    }
+
+    /* Card overlay shown on hover to indicate navigation */
+    .card-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity .28s ease;
+    }
+
+    .card-overlay span {
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: .6px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+        pointer-events: auto;
+        transform: translateY(-6px);
+        opacity: .98;
+    }
+
+    .card:hover .card-overlay { opacity: 1; }
+
+    .card:active { transform: translateY(-2px) scale(.995); box-shadow: 0 4px 12px rgba(0,0,0,0.32); }
+
+    .card h3 {
+        margin-top: 15px;
+        font-weight: bold;
+    }
+
+    .card p {
+        margin-top: 7px;
+        opacity: .75;
+        font-size: .9rem;
+    }
+
+    /* ============ EKİP ============ */
+    .team-section {
+        display: flex;
+        flex-direction: column;
+        gap: 70px;
+    }
+
+    .team-category {
+        /* margin-bottom: 20px; */
+    }
+
+    .team-category h3 {
+        margin-bottom: 10px;
+    }
+
+    .team-members {
+        display: flex;
+        gap: 20px;
+        /* width: 300px; */
+    }
+
+    .member {
+        width: 300px;
+        text-align: center;
+        transition: .2s;
+        position: relative;
+    }
+
+
+    /* Photo wrapper so shine overlay can match image shape */
+    .photo {
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        display: inline-block;
+        transition: transform .35s ease;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .photo img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 260px;
+        object-fit: cover;
+        border: solid #5959598f;
+        border-width: 0 0 3.5px 0;
+    }
+
+    /* Shine overlay */
+    .photo::after {
+        content: '';
+        position: absolute;
+        top: -80%;
+        left: -5%;
+        width: 20%;
+        height: 200%;
+        background: linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0) 100%);
+        transform: rotate(20deg) translateX(-100%);
+        transition: transform .9s cubic-bezier(.2,.9,.2,1);
+        pointer-events: none;
+        mix-blend-mode: screen;
+        opacity: 0.95;
+    }
+
+    /* On hover animate shine across the photo and slightly brighten image */
+    .member:hover .photo::after {
+        transform: rotate(20deg) translateX(680%);
+    }
+
+    .member:hover .photo img {
+        filter: brightness(1.08) saturate(1.05);
+        transform: scale(1.02);
+        transition: transform .35s ease, filter .35s ease;
+    }
+
+    /* Kurucu özel */
+    .founder {
+        /* border: 2px solid gold; */
+        position: relative;
+        /* width: 400px; */
+    }
+
+    /* .founder::before {
+        content: "👑";
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 2rem;
+    } */
+
+    .team-category h3{
+        font-family: "Dancing Script", cursive;
+        font-optical-sizing: auto;
+        font-weight: 300;
+        font-style: normal;
+        font-size: 50px;
+    }
+
+    .team-category div h3{
+        font-size: 30px;
+    }
+
+    /* ============== EKİP (ÖZEL: TAM EKRAN UYUMLU) ============== */
+    .team-main {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 20px 10%;
+    }
+
+    .team-main > h2 {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+        flex: 0 0 auto;
+        font-size: 4rem;
+    }
+
+    /* Team-area fills remaining viewport height so categories can center vertically */
+    .team-main .team-section {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 60px;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .team-main .team-category {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 260px;
+        max-width: 420px;
+        box-sizing: border-box;
+    }
+
+    .team-main .team-category h3 {
+        margin: 0;
+        align-self: center;
+        text-align: center;
+    }
+
+    /* Socials section */
+    .socials-wrap {
+        padding: 30px 10px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #121212;
+        width: 50%;
+    }
+
+    .socials {
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .social-btn {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(0,0,0,0.45);
+        transition: transform .28s ease, box-shadow .28s ease, filter .28s ease;
+        transform-origin: center;
+        will-change: transform, box-shadow;
+        position: relative;
+    }
+
+    .social-btn:hover { transform: translateY(-6px) scale(1.06); box-shadow: 0 20px 46px rgba(0,0,0,0.55); }
+
+    /* subtle pulsing glow on hover, brand-colored via modifier classes */
+    .social-btn::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+        border-radius: 50%;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity .28s ease, transform .28s ease;
+        transform: scale(.9);
+    }
+    .social-btn:hover::after { opacity: 1; transform: scale(1.08); }
+
+    /* default icon size */
+    .social-btn i { font-size: 22px; }
+
+    /* Brand glows */
+    .social-btn--twitter::after { box-shadow: 0 8px 28px rgba(29,155,240,0.18); }
+    .social-btn--instagram::after { box-shadow: 0 8px 28px rgba(214,41,118,0.18); }
+    .social-btn--github::after { box-shadow: 0 8px 28px rgba(100,100,100,0.12); }
+    .social-btn--youtube::after { box-shadow: 0 8px 28px rgba(229,9,20,0.18); }
+    .social-btn--discord::after { box-shadow: 0 8px 28px rgba(88,101,242,0.18); }
+
+    /* small entrance animation for buttons when page loads */
+    .socials .social-btn { animation: socialPop .5s cubic-bezier(.2,.9,.3,1) both; }
+    .socials .social-btn:nth-child(2) { animation-delay: .06s; }
+    .socials .social-btn:nth-child(3) { animation-delay: .12s; }
+    .socials .social-btn:nth-child(4) { animation-delay: .18s; }
+
+    @keyframes socialPop {
+        from { transform: translateY(8px) scale(.96); opacity: 0; }
+        to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .social-btn--twitter { background: linear-gradient(135deg,#1d9bf0,#0a7ad9); }
+    .social-btn--instagram { background: linear-gradient(135deg,#feda75,#d62976); }
+    .social-btn--github { background: linear-gradient(135deg,#6e6e6e,#222); }
+    .social-btn--youtube { background: linear-gradient(135deg,#ff4b4b,#e50914); }
+    .social-btn--discord { background: linear-gradient(135deg,#5865f2,#4752c4); }
+
+    .social-labels { margin-top: 12px; display:flex; gap:18px; justify-content:center; }
+
+    .social-label { color:#ddd; font-size: .95rem; }
+
+    /* Font Awesome icons inside social buttons */
+    .social-btn i { font-size: 22px; }
+
+    /* colored glow on hover matching brand */
+    .social-btn--twitter:hover { box-shadow: 0 12px 40px rgba(29,155,240,0.28); }
+    .social-btn--instagram:hover { box-shadow: 0 12px 40px rgba(214,41,118,0.28); }
+    .social-btn--github:hover { box-shadow: 0 12px 40px rgba(40,40,40,0.28); }
+    .social-btn--youtube:hover { box-shadow: 0 12px 40px rgba(229,9,20,0.28); }
+    .social-btn--discord:hover { box-shadow: 0 12px 40px rgba(88,101,242,0.28); }
+
+    /* Küçük ekranlar için ayar */
+    @media (max-width: 800px) {
+        .team-main .team-section {
+            gap: 30px;
+        }
+        .team-main {
+            padding: 10px 5%;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const sections = Array.from(document.querySelectorAll('body > #intro, body > section'));
+
+    // IntersectionObserver ile görünme animasyonları
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+            }
+        });
+    }, { threshold: 0.25 });
+
+    sections.forEach(s => io.observe(s));
+
+    // Immediate visibility check (handles layout shifts when images load)
+    sections.forEach(s => {
+        const rect = s.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+            s.classList.add('in-view');
+        }
+    });
+
+    /* Apply data-offset values (pixels) to .photo containers so images can be nudged up/down.
+    document.querySelectorAll('.member[data-offset]').forEach(member => {
+        const offset = parseInt(member.getAttribute('data-offset'), 10) || 0;
+        const photo = member.querySelector('.photo');
+        if (photo) photo.style.transform = `translateY(${offset}px)`;
+    });*/
+
+    // Wheel ile bölüm atlama (GTA6 tarzı, yumuşak)
+    let isThrottled = false;
+    let globalScrollLock = false; // prevent new scrolls while a programmatic scroll is in progress
+    window.addEventListener('wheel', (e) => {
+        if (globalScrollLock) return;
+        if (isThrottled) return;
+        const delta = e.deltaY;
+
+        // Bulunan en yakın bölümün index'i
+        let currentIndex = 0;
+        let minDist = Infinity;
+        sections.forEach((s, i) => {
+            const rect = s.getBoundingClientRect();
+            const dist = Math.abs(rect.top);
+            if (dist < minDist) { minDist = dist; currentIndex = i; }
+        });
+
+        const targetIndex = delta > 0 ? Math.min(sections.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1);
+        if (targetIndex !== currentIndex) {
+            isThrottled = true;
+            globalScrollLock = true;
+            sections[targetIndex].scrollIntoView({ behavior: 'smooth' });
+            setTimeout(() => { isThrottled = false; globalScrollLock = false; }, 900);
+        }
+    }, { passive: true });
+
+    // Card click handling: open data-url in new tab when card clicked
+    document.querySelectorAll('.card[data-url]').forEach(card => {
+        card.addEventListener('click', (e) => {
+            const url = card.getAttribute('data-url');
+            if (url) window.open(url, '_blank');
+        });
+    });
+
+    // Card image slideshow: use data-images attribute (comma-separated URLs)
+    document.querySelectorAll('.card[data-images]').forEach(card => {
+        const images = card.getAttribute('data-images').split(',').map(s => s.trim()).filter(Boolean);
+        if (images.length <= 1) return;
+        const img = card.querySelector('img');
+        let idx = 0;
+        let timer = null;
+
+        const showNext = () => {
+            const next = (idx + 1) % images.length;
+            // fade out
+            img.style.opacity = 0;
+            setTimeout(() => {
+                img.src = images[next];
+                img.style.opacity = 1;
+                idx = next;
+            }, 500);
+        };
+
+        const start = () => {
+            if (timer) clearInterval(timer);
+            timer = setInterval(showNext, 3000);
+        };
+        const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+
+        // pause on hover
+        card.addEventListener('mouseenter', stop);
+        card.addEventListener('mouseleave', start);
+
+        // init
+        start();
+    });
+
+    // Enable horizontal snap/scroll behavior for card-containers with >4 cards
+    document.querySelectorAll('.card-container').forEach(container => {
+        const cards = Array.from(container.querySelectorAll('.card'));
+        if (cards.length > 4) {
+            container.classList.add('scroll-x');
+
+            let isThrottled = false;
+            // wheel handler that navigates between cards (snap-like)
+            const handler = (e) => {
+                // Map vertical wheel to horizontal only when container can scroll in that direction.
+                if (isThrottled) return;
+                const delta = e.deltaY;
+                const scrollLeft = container.scrollLeft;
+                const maxScrollLeft = container.scrollWidth - container.clientWidth;
+
+                // Determine if the container can scroll further in the wheel direction.
+                const canScrollRight = scrollLeft < (maxScrollLeft - 1);
+                const canScrollLeft = scrollLeft > 1;
+
+                // If container can scroll in the wheel direction, handle it and prevent default page scroll.
+                if ((delta > 0 && canScrollRight) || (delta < 0 && canScrollLeft)) {
+                    e.preventDefault();
+
+                    // find nearest card index to current scroll
+                    let currentIndex = 0;
+                    let minDist = Infinity;
+                    cards.forEach((c, i) => {
+                        const dist = Math.abs(c.offsetLeft - scrollLeft);
+                        if (dist < minDist) { minDist = dist; currentIndex = i; }
+                    });
+
+                    const targetIndex = delta > 0 ? Math.min(cards.length - 1, currentIndex + 1) : Math.max(0, currentIndex - 1);
+                    if (targetIndex !== currentIndex) {
+                        isThrottled = true;
+                        globalScrollLock = true;
+                        container.scrollTo({ left: cards[targetIndex].offsetLeft, behavior: 'smooth' });
+                        setTimeout(() => { isThrottled = false; globalScrollLock = false; }, 700);
+                    } else {
+                        // small move if no index change
+                        globalScrollLock = true;
+                        container.scrollBy({ left: delta > 0 ? 120 : -120, behavior: 'smooth' });
+                        setTimeout(() => { globalScrollLock = false; }, 450);
+                    }
+                }
+                // otherwise do nothing and allow the event to bubble so the page scrolls normally
+            };
+
+            // attach wheel handler on the container (non-passive to allow preventDefault)
+            container.addEventListener('wheel', handler, { passive: false });
+            
+            // --- build carousel controls (arrows + dots) ---
+            const controls = document.createElement('div');
+            controls.className = 'carousel-controls';
+
+            const left = document.createElement('button');
+            left.className = 'carousel-arrow left';
+            left.setAttribute('aria-label','Previous');
+            left.innerHTML = '<i class="fa fa-chevron-left"></i>';
+            const right = document.createElement('button');
+            right.className = 'carousel-arrow right';
+            right.setAttribute('aria-label','Next');
+            right.innerHTML = '<i class="fa fa-chevron-right"></i>';
+
+            const dots = document.createElement('div');
+            //dots.className = 'carousel-dots';
+
+            // create one dot per visible card (cards.length)
+            cards.forEach((c, i) => {
+                const b = document.createElement('button');
+                b.dataset.index = i;
+                b.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    globalScrollLock = true;
+                    container.scrollTo({ left: c.offsetLeft, behavior: 'smooth' });
+                    // remove focus so browser doesn't try to scroll it into view vertically
+                    e.currentTarget.blur();
+                    setTimeout(() => { globalScrollLock = false; }, 700);
+                });
+                // dots.appendChild(b);
+            });
+
+            // attach controls to the container's parent (host) so they don't scroll with content
+            const host = container.parentElement;
+            host.classList.add('carousel-host');
+            host.appendChild(left);
+            host.appendChild(right);
+            host.appendChild(dots);
+
+            // add gradient overlays as real elements attached to host (so they don't move with the scroller)
+            const leftGrad = document.createElement('div');
+            leftGrad.className = 'carousel-gradient left';
+            const rightGrad = document.createElement('div');
+            rightGrad.className = 'carousel-gradient right';
+            host.appendChild(leftGrad);
+            host.appendChild(rightGrad);
+
+            // Position arrows and gradients beside the container (so they don't scroll with it)
+            const positionControls = () => {
+                const cRect = container.getBoundingClientRect();
+                const hRect = host.getBoundingClientRect();
+                const leftPos = cRect.left - hRect.left;
+                const rightPos = leftPos + cRect.width;
+
+                // gradients
+                leftGrad.style.left = `${leftPos}px`;
+                leftGrad.style.top = `0`;
+                leftGrad.style.height = `${cRect.height}px`;
+                rightGrad.style.left = `${rightPos - 60}px`;
+                rightGrad.style.top = `0`;
+                rightGrad.style.height = `${cRect.height}px`;
+
+                // arrows: place just outside container edges
+                const arrowOffset = 16; // px from container edge
+                left.style.left = `${leftPos - left.offsetWidth - arrowOffset}px`;
+                left.style.top = `${cRect.top - hRect.top + (cRect.height/2) - (left.offsetHeight/2)}px`;
+                right.style.left = `${rightPos + arrowOffset}px`;
+                right.style.top = `${cRect.top - hRect.top + (cRect.height/2) - (right.offsetHeight/2)}px`;
+
+                // dots: center under the container
+                dots.style.left = `${leftPos + cRect.width/2}px`;
+                dots.style.bottom = `-28px`;
+            };
+
+            // observe resizes and window changes
+            const ro = new ResizeObserver(positionControls);
+            ro.observe(container);
+            window.addEventListener('resize', positionControls);
+            // initial position
+            positionControls();
+
+            // arrow click behaviour
+            left.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // find current index by closest offset
+                const scrollLeft = container.scrollLeft;
+                let currentIndex = 0;
+                let minDist = Infinity;
+                cards.forEach((c, i) => {
+                    const dist = Math.abs(c.offsetLeft - scrollLeft);
+                    if (dist < minDist) { minDist = dist; currentIndex = i; }
+                });
+                const target = Math.max(0, currentIndex - 1);
+                globalScrollLock = true;
+                container.scrollTo({ left: cards[target].offsetLeft, behavior: 'smooth' });
+                left.blur();
+                setTimeout(() => { globalScrollLock = false; }, 700);
+            });
+            right.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const scrollLeft = container.scrollLeft;
+                let currentIndex = 0;
+                let minDist = Infinity;
+                cards.forEach((c, i) => {
+                    const dist = Math.abs(c.offsetLeft - scrollLeft);
+                    if (dist < minDist) { minDist = dist; currentIndex = i; }
+                });
+                const target = Math.min(cards.length - 1, currentIndex + 1);
+                globalScrollLock = true;
+                container.scrollTo({ left: cards[target].offsetLeft, behavior: 'smooth' });
+                right.blur();
+                setTimeout(() => { globalScrollLock = false; }, 700);
+            });
+
+            // update dots on scroll (buttons live on the host)
+            const dotButtons = Array.from(dots.querySelectorAll('button'));
+            const updateDots = () => {
+                const scrollLeft = container.scrollLeft;
+                let currentIndex = 0;
+                let minDist = Infinity;
+                cards.forEach((c, i) => {
+                    const dist = Math.abs(c.offsetLeft - scrollLeft);
+                    if (dist < minDist) { minDist = dist; currentIndex = i; }
+                });
+                dotButtons.forEach((b, i) => b.classList.toggle('active', i === currentIndex));
+            };
+
+            container.addEventListener('scroll', () => {
+                // throttle using requestAnimationFrame
+                if (container._raf) cancelAnimationFrame(container._raf);
+                container._raf = requestAnimationFrame(() => { updateDots(); });
+            });
+
+            // initial state
+            updateDots();
+        }
+    });
+
+    // Apply data-offset values (pixels) to .photo containers so images can be nudged up/down.
+    /* document.querySelectorAll('.member[data-offset]').forEach(member => {
+        const offset = parseInt(member.getAttribute('data-offset'), 10) || 0;
+        const photo = member.querySelector('.photo');
+        if (photo) photo.style.transform = `translateY(${offset}px)`;
+    }); */
+});
+</script>
+</head>
+
+<body>
+
+<!-- ============== GİRİŞ =============== -->
+<div id="intro">
+    <div class="intro-logo">
+        <img src="assets/images/BiterGamesLogo-Name.png" alt="Biter Games Studio Logo">
+    </div>
+    <h1>Biter Games Studio</h1>
+    <p>Build Your World.</p>
+</div>
+
+<!-- ============== TANITIM =============== -->
+<section style="animation-play-state: paused;">
+    <h2>Biz Kimiz?</h2>
+
+    <p><b>BiterGamesStudio;</b> 3 kuzenin oluşturmuş olduğu yazılım gurubudur. Oyunlar ve web siteler geliştiren bağımsız bir oyun geliştirme ekibidir.</p>
+
+</section>
+
+<!-- ============== YAYINLANMIŞ OYUNLAR =============== -->
+<section style="animation-play-state: paused;">
+    <h2>Web Sitelerimiz</h2>
+    <div class="card-mainContainer" style="width: 65%;">
+        
+    <div class="card-container">
+
+        <div class="card" data-images="assets/images/EkranGoruntuleri/Ekran görüntüsü 2025-10-12 191646.png,assets/images/EkranGoruntuleri/Ekran görüntüsü 2025-10-12 191658.png" data-url="https://ebubekiraydic.github.io/PTS/">
+            <img src="assets/images/EkranGoruntuleri/Ekran görüntüsü 2025-10-12 191646.png">
+            <h3>Parafy</h3>
+            <p>Nakit kolayca yöneten, bütçe oluşturma, harcama takibi sunan sade ve güvenli bir yönetim uygulamasıdır.</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="assets/images/EkranGoruntuleri/kiheb/Ekran görüntüsü 2025-11-22 123648.png,assets/images/EkranGoruntuleri/kiheb/Ekran görüntüsü 2025-11-22 123658.png" data-url="https://ebubekiraydic.github.io/KiHeb---Kitap-Okuma-Takip-Sistemi/">
+            <img src="assets/images/EkranGoruntuleri/kiheb/Ekran görüntüsü 2025-11-22 123648.png">
+            <h3>Kiheb</h3>
+            <p>Kitaplarını kütüphanene yerleştirebileceğin, kitaplarını takip edebileceğin bir uygulumadır.</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="" data-url="https://ebubekiraydic.github.io/AGD-BayramPasha-OgrenciBilgileri/">
+            <img src="">
+            <h3>Öğrenci Takip Sistemi</h3>
+            <p>Kursa, okul gibi kurumların öğrencilerini yoklama, ders notları, öğrenci hakkında bilgi ve daha fazalsının bulunduğu bir site.</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="" data-url="https://ebubekiraydic.github.io/KarneHesaplayici/">
+            <img src="assets/images/EkranGoruntuleri/Karne/Ekran görüntüsü 2025-11-22 125306.png">
+            <h3>Karne hesaplama</h3>
+            <p>E-okul notlarınızı girip sonra sınıfı geçmeniz için gerken bilgileri söylen bir site.</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+        
+        <div class="card" data-images="" data-url="">
+            <img src="">
+            <h3>Karne hesaplama</h3>
+            <p>E-okul notlarınızı girip sonra sınıfı geçmeniz için gerken bilgileri söylen bir site.</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<!-- ============== GELİŞTİRMEDE OLAN PROJELER =============== -->
+<section style="animation-play-state: paused;">
+    <h2>Geliştirmede Olan Projeler</h2>
+
+    <div class="card-container">
+        <div class="card" data-images="" data-url="#">
+            <img src="">
+            <h3>Project X</h3>
+            <p>Geliştiriliyor...</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="" data-url="#">
+            <img src="">
+            <h3>Project X</h3>
+            <p>Geliştiriliyor...</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="" data-url="#">
+            <img src="">
+            <h3>Project X</h3>
+            <p>Geliştiriliyor...</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+
+        <div class="card" data-images="" data-url="#">
+            <img src="">
+            <h3>Project X</h3>
+            <p>Geliştiriliyor...</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============== TASARIM AŞAMASINDA =============== -->
+<section style="animation-play-state: paused;">
+    <h2>Tasarım Aşamasında</h2>
+
+    <div class="card-container">
+        <div class="card" data-url="#">
+            <img src="">
+            <h3>Concept Y</h3>
+            <p>Tasarım aşaması...</p>
+            <div class="card-overlay"><span>Siteye git</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============== EKİP =============== -->
+<section class="team-main" style="animation-play-state: paused;">
+    <h2>Ekibimiz</h2>
+
+    <div class="team-section">
+
+        <!-- Kurucu -->
+        <div class="team-category">
+            <h3>Kurucu</h3>
+            <div class="team-members">
+                <div class="member" data-offset="-18">
+                    <div class="photo"><img src="assets/images/Bilal_Aydic1.png" alt="Bilal Aydıç"></div>
+                    <h3>Bilal Aydıç</h3>
+                    <p>designer & artist</p>
+                </div>
+
+                <div class="member founder">
+                    <div class="photo"><img src="assets/images/Ebubekir_Aydic4.png" alt="Ebubekir Aydıç" style="max-height: 260px;"></div>
+                    <h3>Ebubekir Aydıç</h3>
+                    <p>Kurucu & Developer & Web Developer</p>
+                </div>
+
+                <div class="member" data-offset="-10">
+                    <div class="photo"><img src="assets/images/Berat_Denizli3.png" alt="Berat Denizli"></div>
+                    <h3>Berat Denizli</h3>
+                    <p>Web Developer & artist</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============== SOSYAL MEDYA =============== -->
+<section style="animation-play-state: paused; display: flex; flex-direction: column;">
+    <h2>Bizi Takip Edin</h2>
+    <div class="socials-wrap">
+        <div class="socials">
+
+            <!--Twitter-->
+            <!-- <a class="social-btn social-btn--twitter" href="https://twitter.com/your" target="_blank" rel="noopener" aria-label="Twitter">
+                <i class="fab fa-twitter" aria-hidden="true"></i>
+            </a> -->
+            <!--İnsta-->
+            <a class="social-btn social-btn--instagram" href="https://www.instagram.com/bitergames/" target="_blank" rel="noopener" aria-label="Instagram">
+                <i class="fab fa-instagram" aria-hidden="true"></i>
+            </a>
+            <!--Github-->
+            <a class="social-btn social-btn--github" href="https://github.com/EbubekirAydic" target="_blank" rel="noopener" aria-label="GitHub">
+                <i class="fab fa-github" aria-hidden="true"></i>
+            </a>
+            <!--Youtube-->
+            <a class="social-btn social-btn--youtube" href="https://www.youtube.com/@BiterGames" target="_blank" rel="noopener" aria-label="YouTube">
+                <i class="fab fa-youtube" aria-hidden="true"></i>
+            </a>
+            <!--Discord-->
+            <a class="social-btn social-btn--discord" href="https://discord.gg/YwEa5TJRYz" target="_blank" rel="noopener" aria-label="Discord">
+                <i class="fab fa-discord" aria-hidden="true"></i>
+            </a>
+            
+        </div>
+    </div>
+</section>
+
+</body>
+</html>
